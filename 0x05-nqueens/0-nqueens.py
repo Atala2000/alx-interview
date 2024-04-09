@@ -45,7 +45,7 @@ def is_attacking(pos0, pos1):
         pos1 (list or tuple): The second queen.
 
     Returns:
-        bool: True if the queens are in an attacking position 
+        bool: True if the queens are in an attacking position
     """
     if (pos0[0] == pos1[0]) or (pos0[1] == pos1[1]):
         return True
