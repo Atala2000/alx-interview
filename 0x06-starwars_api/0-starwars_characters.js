@@ -1,0 +1,30 @@
+#!/usr/bin/node
+const request = require('request');
+
+function getStarWars () {
+  request(`https://swapi-api.alx-tools.com/api/films/${process.argv[2]}`, (error, response, body) => {
+    if (error) {
+      console.error('Error fetching film data: ', error);
+      return;
+    }
+
+    const filmDetails = JSON.parse(body);
+
+    // Iterate over the characters and fetch their details
+    for (const characterURL of filmDetails.characters) {
+      request(characterURL, (err, resp, characterBody) => {
+        if (err) {
+          console.error('Error fetching character: ', err);
+          return;
+        }
+
+        // Parse the character's details as JSON
+        const character = JSON.parse(characterBody);
+        const characterName = character.name;
+        console.log(characterName);
+      });
+    }
+  });
+}
+
+getStarWars();
