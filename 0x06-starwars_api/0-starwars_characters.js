@@ -1,46 +1,25 @@
 #!/usr/bin/node
 const request = require('request');
+const API_URL = 'https://swapi-api.hbtn.io/api';
 
-function getCharacters (movieId) {
-  // Fetch film details
-  request(`https://swapi-api.alx-tools.com/api/films/${movieId}`, (error, response, body) => {
-    if (error) {
-      console.error('Error fetching film data: ', error);
-      return;
+if (process.argv.length > 2) {
+  request(`${API_URL}/films/${process.argv[2]}/`, (err, _, body) => {
+    if (err) {
+      console.log(err);
     }
+    const charactersURL = JSON.parse(body).characters;
+    const charactersName = charactersURL.map(
+      url => new Promise((resolve, reject) => {
+        request(url, (promiseErr, __, charactersReqBody) => {
+          if (promiseErr) {
+            reject(promiseErr);
+          }
+          resolve(JSON.parse(charactersReqBody).name);
+        });
+      }));
 
-    try {
-      const filmDetails = JSON.parse(body);
-
-      // Check if filmDetails.characters is an array
-      if (Array.isArray(filmDetails.characters)) {
-        // Iterate over the characters and fetch their details
-        for (const characterURL of filmDetails.characters) {
-          request(characterURL, (err, resp, characterBody) => {
-            if (err) {
-              console.error('Error fetching character: ', err);
-              return;
-            }
-
-            // Parse the character's details as JSON
-            const character = JSON.parse(characterBody);
-            const characterName = character.name;
-            console.log(characterName);
-          });
-        }
-      } else {
-        console.error('Characters data is not an array.');
-      }
-    } catch (err) {
-      console.error('Error parsing film data: ', err);
-    }
+    Promise.all(charactersName)
+      .then(names => console.log(names.join('\n')))
+      .catch(allErr => console.log(allErr));
   });
-}
-
-// Check if the movie ID is provided as a command line argument
-const movieId = process.argv[2];
-if (!movieId) {
-  console.error('Please provide a movie ID as the first argument.');
-} else {
-  getCharacters(movieId);
 }
