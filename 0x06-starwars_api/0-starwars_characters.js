@@ -1,8 +1,9 @@
 #!/usr/bin/node
 const request = require('request');
 
-function getStarWars () {
-  request(`https://swapi-api.alx-tools.com/api/films/${process.argv[2]}`, (error, response, body) => {
+function getCharacters (movieId) {
+  // Fetch film details
+  request(`https://swapi-api.alx-tools.com/api/films/${movieId}`, (error, response, body) => {
     if (error) {
       console.error('Error fetching film data: ', error);
       return;
@@ -36,4 +37,10 @@ function getStarWars () {
   });
 }
 
-getStarWars();
+// Check if the movie ID is provided as a command line argument
+const movieId = process.argv[2];
+if (!movieId) {
+  console.error('Please provide a movie ID as the first argument.');
+} else {
+  getCharacters(movieId);
+}
